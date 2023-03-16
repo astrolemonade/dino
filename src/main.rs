@@ -10,9 +10,11 @@ struct Handler;
 impl EventHandler for Handler {
     // Set a handler for the `message` event
     async fn message(&self, ctx: Context, msg: Message) {
-        // println!("{}", msg.author.name);
+        let channel = msg.channel_id.to_channel(&ctx.http).await.unwrap();
 
-        if msg.author.name != "Dinobot" {
+        let channel_name = channel.guild().unwrap().name;
+
+        if msg.author.name != "Dinobot" && channel_name == "bots" {
             if let Err(why) = msg.channel_id.say(&ctx.http, msg.content).await {
                 println!("Error sending message: {:?}", why);
             }
@@ -20,7 +22,7 @@ impl EventHandler for Handler {
     }
 
     async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
+        println!("{} is ready!", ready.user.name);
     }
 }
 
