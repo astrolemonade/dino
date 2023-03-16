@@ -1,5 +1,4 @@
-use std::env;
-
+use serde::{Deserialize, Serialize};
 use serenity::async_trait;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
@@ -25,9 +24,18 @@ impl EventHandler for Handler {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+struct BotConfig {
+    token: String,
+}
+
 #[tokio::main]
 async fn main() {
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let config_file = std::fs::read_to_string("config.json").unwrap();
+
+    let config: BotConfig = serde_json::from_str(&config_file).expect("Failed to serialize config");
+
+    let token = config.token;
 
     // Set gateway intents, which decides what events the bot will be notified about
     let intents = GatewayIntents::GUILD_MESSAGES
