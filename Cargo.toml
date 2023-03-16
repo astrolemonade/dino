@@ -16,5 +16,5 @@ categories = ["web-programming"]
 [dependencies]
 serde = "1.0.156"
 serde_json = "1.0.94"
-serenity = { version="0.11.5", default-features = false, features = ["client", "gateway", "rustls_backend", "model"] }
+serenity = { version="0.11.5", default-features = false, features = ["client", "cache", "gateway", "rustls_backend", "model"] }
 tokio = { version = "1.26.0", features = ["macros", "rt-multi-thread"] }
