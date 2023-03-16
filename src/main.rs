@@ -3,8 +3,6 @@ use serenity::async_trait;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
-use std::fs::File;
-use std::io::{BufReader, Read};
 
 struct Handler;
 
@@ -28,23 +26,16 @@ impl EventHandler for Handler {
 
 #[derive(Serialize, Deserialize)]
 struct BotConfig {
-    discord_token: String,
+    token: String,
 }
 
 #[tokio::main]
 async fn main() {
-    let file: File = File::open("config.json").expect("Failed to open config file");
+    let config_file = std::fs::read_to_string("config.json").unwrap();
 
-    let mut buf_reader = BufReader::new(file);
+    let config: BotConfig = serde_json::from_str(&config_file).expect("Failed to serialize config");
 
-    let mut contents = String::new();
-    buf_reader
-        .read_to_string(&mut contents)
-        .expect("Failed to read the config file");
-
-    let config: BotConfig = serde_json::from_str(&contents).expect("Failed to serialize config");
-
-    let token = config.discord_token;
+    let token = config.token;
 
     // Set gateway intents, which decides what events the bot will be notified about
     let intents = GatewayIntents::GUILD_MESSAGES
