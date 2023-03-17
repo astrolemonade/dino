@@ -5,7 +5,6 @@ use serenity::model::application::command::Command;
 use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
-use serenity::model::id::GuildId;
 use serenity::model::prelude::interaction::application_command::CommandDataOption;
 use serenity::prelude::*;
 
@@ -29,20 +28,13 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is ready!", ready.user.name);
 
-        let guild_command =
-            Command::create_global_application_command(&ctx.http, |command| register_ping(command))
-                .await;
-
-        println!(
-            "I created the following global slash command: {:#?}",
-            guild_command
-        );
+        Command::create_global_application_command(&ctx.http, |command| register_ping(command))
+            .await
+            .unwrap();
     }
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(command) = interaction {
-            println!("Received command interaction: {:#?}", command);
-
             let content = match command.data.name.as_str() {
                 "ping" => run_ping(&command.data.options),
                 _ => "not implemented :(".to_string(),
@@ -92,7 +84,7 @@ pub fn run_ping(_options: &[CommandDataOption]) -> String {
 }
 
 pub fn register_ping(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("ping").description("A ping command")
+    command.name("ping").description("play ping pong")
 }
 
 fn get_config() -> BotConfig {
