@@ -4,6 +4,8 @@ use serenity::model::application::command::Command;
 use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
+// use serenity::model::id::{ChannelId, GuildId};
+use serenity::model::prelude::Member;
 use serenity::prelude::*;
 
 mod commands;
@@ -59,6 +61,28 @@ impl EventHandler for Handler {
             }
         }
     }
+
+    async fn guild_member_addition(&self, ctx: Context, new_member: Member) {
+        let message = format!("Welcome to the server, {}!", new_member.user.mention());
+
+        let channel_name = "general";
+
+        if let Some(channel) = ctx
+            .http
+            .get_guild(utils::get_config().guild_id)
+            .await
+            .unwrap()
+            .channels(&ctx.http)
+            .await
+            .unwrap()
+            .values()
+            .find(|c| c.name == channel_name)
+        {
+            if let Err(why) = channel.say(&ctx.http, message).await {
+                println!("Error sending message: {:?}", why);
+            }
+        }
+    }
 }
 
 #[tokio::main]
@@ -68,7 +92,8 @@ async fn main() {
     // Set gateway intents, which decides what events the bot will be notified about
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
-        | GatewayIntents::MESSAGE_CONTENT;
+        | GatewayIntents::MESSAGE_CONTENT
+        | GatewayIntents::GUILD_MEMBERS;
 
     let mut client = Client::builder(&token, intents)
         .event_handler(Handler)
