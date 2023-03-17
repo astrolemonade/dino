@@ -29,18 +29,6 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is ready!", ready.user.name);
 
-        let guild_id = GuildId(get_config().guild_id);
-
-        let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
-            commands.create_application_command(|command| register_ping(command))
-        })
-        .await;
-
-        println!(
-            "I now have the following guild slash commands: {:#?}",
-            commands
-        );
-
         let guild_command =
             Command::create_global_application_command(&ctx.http, |command| register_ping(command))
                 .await;
