@@ -1,0 +1,4 @@
+{
+  "token": "mytoken",
+  "guild_id": 1234
+}
